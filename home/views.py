@@ -20,7 +20,7 @@ def index(request):
 def person(request):
     if request.method == "GET":
         # query set data from database
-        objs = Person.objects.all()
+        objs = Person.objects.filter(role__isnull=False)
         # coverting this into JSON
         serializer = PersonSerializer(objs, many=True)
 
