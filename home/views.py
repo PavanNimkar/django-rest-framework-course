@@ -1,7 +1,17 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializers import PersonSerializer
+from .serializers import PersonSerializer, LoginSerializer
 from .models import Person
+
+
+@api_view(["POST"])
+def login_view(request):
+    data = request.data
+    serializer = LoginSerializer(data=data)
+    if serializer.is_valid():
+        print(serializer.data)
+        return Response(serializer.data)
+    return Response(serializer.errors)
 
 
 # Create your views here.
