@@ -1,4 +1,5 @@
 from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import PersonSerializer, LoginSerializer
 from .models import Person
@@ -24,6 +25,23 @@ def index(request):
     }
 
     return Response(courses)
+
+
+class CheckRequest(APIView):
+    def get(self, request):
+        return Response({"message": f"this is a {request.method} request"})
+
+    def post(self, request):
+        return Response({"message": f"this is a {request.method} request"})
+
+    def put(self, request):
+        return Response({"message": f"this is a {request.method} request"})
+
+    def patch(self, request):
+        return Response({"message": f"this is a {request.method} request"})
+
+    def delete(self, request):
+        return Response({"message": f"this is a {request.method} request"})
 
 
 @api_view(["GET", "POST", "PATCH", "PUT", "DELETE"])
