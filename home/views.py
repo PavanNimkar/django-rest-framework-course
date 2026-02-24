@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from .serializers import PersonSerializer, LoginSerializer
 from rest_framework import viewsets
 from .models import Person
+from rest_framework import status
 
 
 @api_view(["POST"])
@@ -100,4 +101,4 @@ class PersonsViewSet(viewsets.ModelViewSet):
         if search:
             queryset = queryset.filter(name__startswith=search)
             serializer = PersonSerializer(queryset, many=True)
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
