@@ -1,20 +1,12 @@
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import PersonSerializer, LoginSerializer
+from .serializers import PersonSerializer, LoginSerializer, RegistrationSerializer
 from rest_framework import viewsets
 from .models import Person
 from rest_framework import status
-
-
-@api_view(["POST"])
-def login_view(request):
-    data = request.data
-    serializer = LoginSerializer(data=data)
-    if serializer.is_valid():
-        print(serializer.data)
-        return Response(serializer.data)
-    return Response(serializer.errors)
+from django.contrib.auth import authenticate
+from rest_framework.authtoken.models import Token
 
 
 # Create your views here.
@@ -102,3 +94,51 @@ class PersonsViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(name__startswith=search)
             serializer = PersonSerializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class RegisterAPI(APIView):
+    def post(self, request):
+        data = request.data
+        serializer = RegistrationSerializer(data=data)
+
+        if not serializer.is_valid():
+            return Response(
+                {"message": serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer.save()
+
+        return Response(
+            {"message": "user created!"},
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class LoginAPI(APIView):
+    def post(self, request):
+        data = request.data
+        serializer = LoginSerializer(data=data)
+
+        if not serializer.is_valid():
+            return Response(
+                {"message": serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user = authenticate(
+            username=serializer.data["username"], password=serializer.data["password"]
+        )
+
+        if not user:
+            return Response(
+                {"message": "User not found"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        token, _ = Token.objects.get_or_create(user=user)
+        print(token)
+        return Response(
+            {"message": "user logged in!", "token": f"{token}"},
+            status=status.HTTP_200_OK,
+        )
