@@ -2,13 +2,13 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import PersonSerializer, LoginSerializer, RegistrationSerializer
-from rest_framework import viewsets
 from .models import Person
-from rest_framework import status
+from rest_framework import status, viewsets, filters
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
+from home.helpers import UserPagination
 
 
 # Create your views here.
@@ -88,16 +88,11 @@ def person(request):
 class PersonsViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
+    pagination_class = UserPagination
     serializer_class = PersonSerializer
     queryset = Person.objects.all()
-
-    def list(self, request):
-        search = request.GET.get("search")
-        queryset = self.queryset
-        if search:
-            queryset = queryset.filter(name__startswith=search)
-            serializer = PersonSerializer(queryset, many=True)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["name"]
 
 
 class RegisterAPI(APIView):
