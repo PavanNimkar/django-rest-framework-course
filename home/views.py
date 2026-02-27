@@ -7,6 +7,8 @@ from .models import Person
 from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 
 
 # Create your views here.
@@ -84,6 +86,8 @@ def person(request):
 
 
 class PersonsViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
     serializer_class = PersonSerializer
     queryset = Person.objects.all()
 
