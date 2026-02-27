@@ -1,4 +1,4 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import PersonSerializer, LoginSerializer, RegistrationSerializer
@@ -86,6 +86,7 @@ def person(request):
 
 
 class PersonsViewSet(viewsets.ModelViewSet):
+    http_method_names = ["get", "post"]
     permission_classes = [IsAuthenticated]
     authentication_classes = [TokenAuthentication]
     pagination_class = UserPagination
@@ -93,6 +94,15 @@ class PersonsViewSet(viewsets.ModelViewSet):
     queryset = Person.objects.all()
     filter_backends = [filters.SearchFilter]
     search_fields = ["name"]
+
+    @action(detail=True, methods=["GET"])
+    def send_email(self, request, pk):
+        try:
+            obj = Person.objects.get(pk=pk)
+            serializer = PersonSerializer(obj)
+            return Response({"message": "email sent", "data": serializer.data})
+        except Exception as e:
+            return Response({"message": "something went wrong!", "error": str(e)})
 
 
 class RegisterAPI(APIView):

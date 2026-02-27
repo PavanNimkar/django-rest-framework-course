@@ -17,7 +17,7 @@ urlpatterns = [
     path("index", index),
     path("person/", person),
     path("check-request", CheckRequest.as_view()),
-    path("persons", include(router.urls)),
+    path("router-api/", include(router.urls)),
     path("register/", RegisterAPI.as_view()),
     path("login/", LoginAPI.as_view()),
 ]
